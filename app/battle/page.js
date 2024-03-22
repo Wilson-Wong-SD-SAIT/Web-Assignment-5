@@ -59,6 +59,10 @@ export default function Battle() {
 
 
   async function onClickBattle(e) {
+    if (userData.items.length == 0) {
+      alert("You don't have any battler. Draw first.")
+      return;
+    }
     // pick randomr battler from User
     let battler1 = userData.items[Math.floor((Math.random() * userData.items.length))];
     // pick randomr battler from Oppoent
