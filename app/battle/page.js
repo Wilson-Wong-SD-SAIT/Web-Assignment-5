@@ -37,7 +37,7 @@ export default function Battle() {
     let oppoentBattler = usersData[e.target.value].items[Math.floor((Math.random() * usersData[e.target.value].items.length))];
 
     try {
-      // Sends a PUT request to update user data for user with id 2.
+      // Sends a PUT request to update users data for battle.
       const response = await fetch(`http://localhost:3001/api/battle?battler1=${playerBattler}&battler2=${oppoentBattler}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

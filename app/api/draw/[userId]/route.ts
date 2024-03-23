@@ -19,7 +19,7 @@ async function addDataToFireStore(uid, item) {
       }
   }
 
-export async function GET(req: NextRequest, { params }){
+export async function PATCH(req: NextRequest, { params }){
 
     try {
         const response = await fetch("https://rps101.pythonanywhere.com/api/v1/objects/all"); // Sends a GET request to the API.

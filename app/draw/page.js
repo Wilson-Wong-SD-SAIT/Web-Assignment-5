@@ -9,7 +9,11 @@ export default function Draw() {
 
   async function onClickDraw() {
     try {
-      const response = await fetch(`http://localhost:3001/api/draw/${user.uid}`); // Sends a GET request to the API.
+      // Sends a PUT request to update user data for draw.
+      const response = await fetch(`http://localhost:3001/api/draw/${user.uid}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
       if (response.ok) {
         const json = await response.json(); 
         alert("You just draw: " + json.item); 
