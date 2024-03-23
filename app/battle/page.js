@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useUserAuth } from "../auth-context"; // Adjust the path as needed
 import Link from "next/link";
 import { db } from "@/app/firebase"; // Your custom Firebase configuration
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, increment  } from "firebase/firestore"; 
+import { collection, doc, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, increment  } from "firebase/firestore"; 
 
 // Asynchronously fetches user data from Firestore
 async function fetchDataFromFirestore() {
@@ -33,19 +33,21 @@ export default function Battle() {
     fetch(`https://rps101.pythonanywhere.com/api/v1/match?object_one=${battler1}&object_two=${battler2}`) 
     .then(response => response.json());
   
-  async function updateToFireStore(uid, result) {
+  async function updateToFireStore(uid, result, battler) {
     try {
       if(result == "win"){
         await updateDoc(doc(db, "users", uid), {
-          win: increment(1)
+          win: increment(1),
+          items: arrayUnion(battler),
         });
       } else if(result == "draw") {
         await updateDoc(doc(db, "users", uid), {
-          draw: increment(1)
+          draw: increment(1),
         });
       } else {
         await updateDoc(doc(db, "users", uid), {
-          lose: increment(1)
+          lose: increment(1),
+          items: arrayRemove(battler),
         });
       }
 
@@ -71,21 +73,19 @@ export default function Battle() {
     const {winner, outcome, loser} = await fetchBattle(battler1, battler2);
 
     let oppoent = usersData[e.target.value].name + "'s";
-
-
     try {
       if(winner == battler1){
-        await updateToFireStore(user.uid, "win");
-        await updateToFireStore(usersData[e.target.value].id, "lose");
+        await updateToFireStore(user.uid, "win", battler1);
+        await updateToFireStore(usersData[e.target.value].id, "lose", battler2);
         alert(`Your ${winner} ${outcome} ${oppoent} ${loser}`);
       } else if( winner == battler2) {
-        await updateToFireStore(user.uid, "lose");
-        await updateToFireStore(usersData[e.target.value].id, "win");
+        await updateToFireStore(user.uid, "lose", battler1);
+        await updateToFireStore(usersData[e.target.value].id, "win", battler2);
         alert(`${oppoent} ${winner} ${outcome} your ${loser}`);
       } else {
-        await updateToFireStore(user.uid, "draw");
+        await updateToFireStore(user.uid, "draw", null);
         await updateToFireStore(usersData[e.target.value].id, "draw");
-        alert(`No winner! It's a draw.`);
+        alert(`Your ${battler1} vs ${oppoent} ${battler2}. It's a draw.`);
       }
 
       // update userData in context

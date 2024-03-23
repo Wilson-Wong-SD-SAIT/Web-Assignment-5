@@ -7,32 +7,6 @@ import { db } from "@/app/firebase"; // Your custom Firebase configuration
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore"; 
 
 
-async function swapFighter(uid, email, item) {
-  try {
-    const docRef = doc(db, "users", uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      if (docSnap.data().fighter === ""){
-        // Attempts to add a new document to the 'users' collection with the provided uid, email, and item.
-        await updateDoc(doc(db, "users", uid), {
-        fighter: arrayUnion(item),
-        });
-      } else {
-
-      }
-
-    } else {
-      alert("You don't have fighter, please draw.");
-    }
-    console.log("Document has been written"); // Logs the ID of the new document if addition is successful.
-    return true; // Returns true to indicate that the document was successfully added.
-  } catch (error) {
-    console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-    return false; // Returns false to indicate that the document was not added due to an error.
-  }
-}
-
 export default function Draw() {
   const { user, onSetUserData } = useUserAuth(); // Assume no need for firebaseSignOut directly here unless a logout feature on this page is desired
 
