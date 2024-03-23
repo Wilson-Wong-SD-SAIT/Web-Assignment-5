@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useUserAuth } from "../auth-context"; // Adjust the path as needed
 import Link from "next/link";
-import { db } from "@/app/firebase"; // Your custom Firebase configuration
-import { collection, doc, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, increment  } from "firebase/firestore"; 
+import { db } from "../firebase"; // Your custom Firebase configuration
+import { collection, doc, getDoc, getDocs, updateDoc, arrayRemove, arrayUnion, increment  } from "firebase/firestore"; 
 
 // Asynchronously fetches user data from Firestore
 async function fetchDataFromFirestore() {
@@ -17,96 +17,59 @@ async function fetchDataFromFirestore() {
     return data; // Return the array containing all user data
 }
 
-
-
 export default function Battle() {
   // State variables for the component
   const [usersData, setUsersData] = useState([]); // Holds array of user data fetched from Firestore
   const { user, userData, onSetUserData } = useUserAuth(); // Assume no need for firebaseSignOut directly here unless a logout feature on this page is desired
-
-  async function fetchData() {
-    const data = await fetchDataFromFirestore(); // Get user data from Firestore
-    setUsersData(data); // Update state with the fetched user data
-  }
-  
-  const fetchBattle = (battler1, battler2) => 
-    fetch(`https://rps101.pythonanywhere.com/api/v1/match?object_one=${battler1}&object_two=${battler2}`) 
-    .then(response => response.json());
-  
-  async function updateToFireStore(uid, result, battler) {
-    try {
-      if(result == "win"){
-        await updateDoc(doc(db, "users", uid), {
-          win: increment(1),
-          items: arrayUnion(battler),
-        });
-      } else if(result == "draw") {
-        await updateDoc(doc(db, "users", uid), {
-          draw: increment(1),
-        });
-      } else {
-        await updateDoc(doc(db, "users", uid), {
-          lose: increment(1),
-          items: arrayRemove(battler),
-        });
-      }
-
-      console.log("Document has been written"); // Logs the ID of the new document if addition is successful.
-      return true; // Returns true to indicate that the document was successfully added.
-    } catch (error) {
-      console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-      return false; // Returns false to indicate that the document was not added due to an error.
-    }
-  }
-
 
   async function onClickBattle(e) {
     if (userData.items.length == 0) {
       alert("You don't have any battler. Draw first.")
       return;
     }
+    let playerId = user.uid;
     // pick randomr battler from User
-    let battler1 = userData.items[Math.floor((Math.random() * userData.items.length))];
+    let playerBattler = userData.items[Math.floor((Math.random() * userData.items.length))];
+
+    let oppoentId = usersData[e.target.value].id;
+    let oppoentName = usersData[e.target.value].name;
     // pick randomr battler from Oppoent
-    let battler2 = usersData[e.target.value].items[Math.floor((Math.random() * usersData[e.target.value].items.length))];
+    let oppoentBattler = usersData[e.target.value].items[Math.floor((Math.random() * usersData[e.target.value].items.length))];
 
-    const {winner, outcome, loser} = await fetchBattle(battler1, battler2);
-
-    let oppoent = usersData[e.target.value].name + "'s";
     try {
-      if(winner == battler1){
-        await updateToFireStore(user.uid, "win", battler1);
-        await updateToFireStore(usersData[e.target.value].id, "lose", battler2);
-        alert(`Your ${winner} ${outcome} ${oppoent} ${loser}`);
-      } else if( winner == battler2) {
-        await updateToFireStore(user.uid, "lose", battler1);
-        await updateToFireStore(usersData[e.target.value].id, "win", battler2);
-        alert(`${oppoent} ${winner} ${outcome} your ${loser}`);
+      // Sends a PUT request to update user data for user with id 2.
+      const response = await fetch(`http://localhost:3001/api/battle?battler1=${playerBattler}&battler2=${oppoentBattler}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          playerId: playerId,
+          playerBattler: playerBattler, 
+          oppoentId: oppoentId,
+          oppoentName: oppoentName,
+          oppoentBattler: oppoentBattler, 
+        }), 
+      });
+      if (response.ok) {
+        const json = await response.json(); 
+        alert(json.message); 
+        onSetUserData(json.data);
       } else {
-        await updateToFireStore(user.uid, "draw", null);
-        await updateToFireStore(usersData[e.target.value].id, "draw");
-        alert(`Your ${battler1} vs ${oppoent} ${battler2}. It's a draw.`);
+        console.log("Failed to update users."); // Throws an error if the response is not OK.
       }
-
-      // update userData in context
-      const querySnapshot = await getDoc(doc(db, "users", user.uid));
-      onSetUserData(querySnapshot.data());
-
-      // Fetch all user data from Firestore
-      fetchData(); 
-
-      console.log("Document has been written"); // Logs the ID of the new document if addition is successful.
-      return true; // Returns true to indicate that the document was successfully added.
     } catch (error) {
       console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-      return false; // Returns false to indicate that the document was not added due to an error.
     }
+      
   }
 
   // Fetch user data from Firestore when the component mounts
   useEffect(() => {
+    async function fetchData() {
+      const data = await fetchDataFromFirestore(); // Get user data from Firestore
+      setUsersData(data); // Update state with the fetched user data
+    }
     fetchData();
-  }, []); // Empty dependency array means this effect runs once on component mount
+  }, [userData]); // Empty dependency array means this effect runs once on component mount
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
@@ -145,6 +108,7 @@ export default function Battle() {
       ) : (
         <p>Please log in to see the weather information.</p>
       )}
+
         <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
             <Link href="/">Home</Link>
         </button>

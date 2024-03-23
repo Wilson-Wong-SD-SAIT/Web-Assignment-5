@@ -14,8 +14,7 @@ import {
   GithubAuthProvider,
 } from "firebase/auth";
 // Import the authenticated Firebase instance from the local firebase module.
-import { auth } from "./firebase";
-import { db } from "@/app/firebase"; // Your custom Firebase configuration
+import { auth, db } from "./firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore"; 
 
 // Create a new React context for authentication; it's a construct that allows us to pass data deeply throughout the component tree.

@@ -1,7 +1,7 @@
 "use client"; // This directive indicates that we're using this file in a client-side environment.
 
 import React from 'react';
-import { useUserAuth } from "@/app/auth-context";
+import { useUserAuth } from "../app/auth-context";
 
 export default function Rsp() {
   const { userData } = useUserAuth();

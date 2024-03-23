@@ -3,48 +3,24 @@
 import React from "react";
 import { useUserAuth } from "../auth-context"; // Adjust the path as needed
 import Link from "next/link";
-import { db } from "@/app/firebase"; // Your custom Firebase configuration
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore"; 
-
 
 export default function Draw() {
   const { user, onSetUserData } = useUserAuth(); // Assume no need for firebaseSignOut directly here unless a logout feature on this page is desired
 
-  const fetchDraw =
-  fetch("https://rps101.pythonanywhere.com/api/v1/objects/all") 
-  .then(response => response.json())
-  .then(json =>  json[Math.floor((Math.random() * 101))] ); 
-
-  async function addDataToFireStore(uid, item) {
+  async function onClickDraw() {
     try {
-      await updateDoc(doc(db, "users", uid), {
-        items: arrayUnion(item),
-      });
-      // update userData in context
-      const querySnapshot = await getDoc(doc(db, "users", uid));
-      onSetUserData(querySnapshot.data());
-
-      console.log("Document has been written"); // Logs the ID of the new document if addition is successful.
-      return true; // Returns true to indicate that the document was successfully added.
+      const response = await fetch(`http://localhost:3001/api/draw/${user.uid}`); // Sends a GET request to the API.
+      if (response.ok) {
+        const json = await response.json(); 
+        alert("You just draw: " + json.item); 
+        onSetUserData(json.data);
+      } else {
+        console.log("Failed to fetch users."); // Throws an error if the response is not OK.
+      }
     } catch (error) {
       console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-      return false; // Returns false to indicate that the document was not added due to an error.
     }
   }
-
-  async function onClickDraw() {
-    let item = await fetchDraw;
-    alert("You just draw: " + item); 
-    const added = await addDataToFireStore( user.uid, item ); 
-    if (added) {
-      // If the data was successfully added:
-      console.log("Data Stored to Firestore!"); // Shows a success message to the user.
-    } else {
-      // If there was an error adding the data:
-      alert("There was an Error while saving data"); // Shows an error message to the user.
-    }
-  }
-
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
