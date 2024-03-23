@@ -14,8 +14,7 @@ import {
   GithubAuthProvider,
 } from "firebase/auth";
 // Import the authenticated Firebase instance from the local firebase module.
-import { auth, db } from "./firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { auth } from "./firebase";
 
 // Create a new React context for authentication; it's a construct that allows us to pass data deeply throughout the component tree.
 const AuthContext = createContext();
@@ -48,29 +47,39 @@ export const AuthContextProvider = ({ children }) => {
 
   // Asynchronously fetches user data from Firestore
   async function fetchDataFromFirestore(uid, email) {
-    try {
-      const docSnap = await getDoc(doc(db, "users", uid));
-      if (docSnap.exists()) {
-        setUserData(docSnap.data());
-      } else {
-        let name = null;
-        while (!name){ name = prompt("Please enter your Username","Ash Ketchum"); }
-        await setDoc(doc(db, "users", uid), {
-          name: name,
-          email: email,
-          items: [],
-          fighter: "",
-          win: 0,
-          draw: 0,
-          lose: 0,
-        });
+    if (user !== null){
+      try {
+        // Sends a GET request to get user items.
+        const response = await fetch(`http://localhost:3001/api/user/${uid}`);
+        if (response.ok) {
+          const json = await response.json(); 
+          if (json.exist) {
+            setUserData(json);
+            console.log("Document has been retrieved"); 
+            return true; // Returns true to indicate that the document was successfully added.
+          } else {
+            // Create New User
+            let name = null;
+            while (!name){ name = prompt("Please enter your Username","Ash Ketchum"); }
+              // Sends a PUT request to update user data for draw.
+              const response = await fetch(`http://localhost:3001/api/user/${uid}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name, email: email,}), 
+              });
+              if (response.ok) {
+                setUserData(json);
+                console.log("Document has been created"); // Logs the ID of the new document if addition is successful.
+                return true; // Returns true to indicate that the document was successfully added.
+              }
+          }
+        }
+      } catch (error) {
+        console.error("Error occurred: ", error); // Logs an error message if the addition fails.
+        return false; // Returns false to indicate that the document was not added due to an error.
       }
-      console.log("Document has been written"); // Logs the ID of the new document if addition is successful.
-      return true; // Returns true to indicate that the document was successfully added.
-    } catch (error) {
-      console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-      return false; // Returns false to indicate that the document was not added due to an error.
     }
+
   }
   // Effect hook to monitor the authentication state change.
   // It sets the user state based on Firebase's current user.
@@ -78,8 +87,8 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser != null){
-        fetchDataFromFirestore(currentUser.uid,currentUser.email);
+      if (currentUser !== null){
+        fetchDataFromFirestore(user.uid,user.email);
         //(async ()=> { (await fetchDataFromFirestore(currentUser.uid,currentUser.email))  })();
       }  
       

@@ -29,7 +29,6 @@ async function updateToFireStore(uid, battler, result) {
 }
 
 async function getDataFromFireStore(uid) {
-
     try {
         const querySnapshot = await getDoc(doc(db, "users", uid));
         const data = await querySnapshot.data();

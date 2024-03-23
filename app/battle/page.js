@@ -4,17 +4,21 @@ import React, { useState, useEffect } from "react";
 import { useUserAuth } from "../auth-context"; // Adjust the path as needed
 import Link from "next/link";
 import { db } from "../firebase"; // Your custom Firebase configuration
-import { collection, doc, getDoc, getDocs, updateDoc, arrayRemove, arrayUnion, increment  } from "firebase/firestore"; 
+import { collection, getDocs  } from "firebase/firestore"; 
 
 // Asynchronously fetches user data from Firestore
 async function fetchDataFromFirestore() {
-    const querySnapshot = await getDocs(collection(db, "users")); // Gets all documents from the 'users' collection
-    const data = []; // Initialize an empty array to hold our user data
-    querySnapshot.forEach((doc) => {
-      // Loop through each document in the collection
-      data.push({ id: doc.id, ...doc.data() }); // Add the document data (and its Firestore ID) to the data array
-    });
-    return data; // Return the array containing all user data
+  try {
+    // Sends a GET request to get user items.
+    const response = await fetch(`http://localhost:3001/api/userAll/`);
+    if (response.ok) {
+      const json = await response.json(); 
+      return json;
+    }
+  } catch (error) {
+    console.error("Error occurred: ", error); // Logs an error message if the addition fails.
+    return false; // Returns false to indicate that the document was not added due to an error.
+  }
 }
 
 export default function Battle() {
