@@ -9,7 +9,7 @@ export default function Draw() {
 
   async function onClickDraw() {
     try {
-      // Sends a PUT request to update user data for draw.
+      // Sends a PATCH request to update user data for draw.
       const response = await fetch(`http://localhost:3001/api/draw/${user.uid}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -19,10 +19,10 @@ export default function Draw() {
         alert("You just draw: " + json.item); 
         onSetUserData(json.data);
       } else {
-        console.log("Failed to fetch users."); // Throws an error if the response is not OK.
+        throw new Error("Failed to call API draw."); // Throws an error if the response is not OK.
       }
     } catch (error) {
-      console.error("Error occurred: ", error); // Logs an error message if the addition fails.
+      console.error("Error occurred: ", error); // Logs an error message if the draw fails.
     }
   }
 
@@ -39,7 +39,7 @@ export default function Draw() {
           </button>
         </>
       ) : (
-        <p>Please log in to see the weather information.</p>
+        <p>Please log in to play RSP game.</p>
       )}
         <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
             <Link href="/">Home</Link>

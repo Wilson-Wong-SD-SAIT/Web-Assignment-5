@@ -3,21 +3,21 @@
 import React, { useState, useEffect } from "react";
 import { useUserAuth } from "../auth-context"; // Adjust the path as needed
 import Link from "next/link";
-import { db } from "../firebase"; // Your custom Firebase configuration
-import { collection, getDocs  } from "firebase/firestore"; 
 
 // Asynchronously fetches user data from Firestore
 async function fetchDataFromFirestore() {
   try {
-    // Sends a GET request to get user items.
+    // Sends a GET request to get all user data.
     const response = await fetch(`http://localhost:3001/api/userAll/`);
     if (response.ok) {
       const json = await response.json(); 
       return json;
+    } else {
+      throw new Error("Failed to call API fetch all users data."); // Throws an error if the response is not OK.
     }
   } catch (error) {
-    console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-    return false; // Returns false to indicate that the document was not added due to an error.
+    console.error("Error occurred: ", error.message); // Logs an error message if the addition fails.
+    return []; // Returns empty array to indicate that no user was loaded due to an error.
   }
 }
 
@@ -27,6 +27,7 @@ export default function Battle() {
   const { user, userData, onSetUserData } = useUserAuth(); // Assume no need for firebaseSignOut directly here unless a logout feature on this page is desired
 
   async function onClickBattle(e) {
+    // prevent user to battle without battler
     if (userData.items.length == 0) {
       alert("You don't have any battler. Draw first.")
       return;
@@ -41,7 +42,7 @@ export default function Battle() {
     let oppoentBattler = usersData[e.target.value].items[Math.floor((Math.random() * usersData[e.target.value].items.length))];
 
     try {
-      // Sends a PUT request to update users data for battle.
+      // Sends a PATCH request to update users data for battle.
       const response = await fetch(`http://localhost:3001/api/battle?battler1=${playerBattler}&battler2=${oppoentBattler}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -58,10 +59,10 @@ export default function Battle() {
         alert(json.message); 
         onSetUserData(json.data);
       } else {
-        console.log("Failed to update users."); // Throws an error if the response is not OK.
+        throw new Error("Failed to call API battle."); // Throws an error if the response is not OK.
       }
     } catch (error) {
-      console.error("Error occurred: ", error); // Logs an error message if the addition fails.
+      console.error("Error occurred: ", error); // Logs an error message if the battle fails.
     }
       
   }
@@ -73,18 +74,16 @@ export default function Battle() {
       setUsersData(data); // Update state with the fetched user data
     }
     fetchData();
-  }, [userData]); // Empty dependency array means this effect runs once on component mount
+  }, [userData]); // Re-render component if user data changed after battle
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
-      <h1 className="text-2xl font-bold mb-4 text-red-800">
-        Please keep a peaceful fighting environment
-      </h1>
+      <p className="text-2xl font-bold mb-4 text-red-400">Let knock out oppoent's Rock-Scissors-Paper!</p>
       {user ? (
         <div className="w-full lg:w-1/2 px-4">
           <div className="bg-white rounded shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Users List</h2>
-            {/* User cards grid */}
+            {/* Opponent grid */}
             <div className="space-y-4 text-black">
               {usersData.map((uData, userInd) => 
                 uData.id != user.uid &&
@@ -110,7 +109,7 @@ export default function Battle() {
 
 
       ) : (
-        <p>Please log in to see the weather information.</p>
+        <p>Please log in to play RSP game.</p>
       )}
 
         <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">

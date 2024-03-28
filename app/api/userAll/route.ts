@@ -11,9 +11,10 @@ export async function GET(){
           // Loop through each document in the collection
           data.push({ id: doc.id, ...doc.data() }); // Add the document data (and its Firestore ID) to the data array
         });
+        console.log("Document have been retrieved"); // Logs if creation is necessary.
         return NextResponse.json(data, {status: 200});
       } catch (error) {
         console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-        return false; // Returns false to indicate that the document was not added due to an error.
+        return NextResponse.json(null, { status: 500 });
       }
 }

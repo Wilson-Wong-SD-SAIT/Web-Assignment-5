@@ -20,11 +20,10 @@ async function updateToFireStore(uid, battler, result) {
         });
       }
 
-      console.log("Document has been written"); // Logs the ID of the new document if addition is successful.
-      return true; // Returns true to indicate that the document was successfully added.
+      console.log(`Document ${uid} has been written`); // Logs id if update is successful.
     } catch (error: any) {
-      console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-      return false; // Returns false to indicate that the document was not added due to an error.
+      console.error(`Failed to update user ${uid}.`, error.message); // Logs an error message if update is unsuccessful.
+      throw new Error(error.message, error); // Throws the error for API response.
     }
 }
 
@@ -32,49 +31,56 @@ async function getDataFromFireStore(uid) {
     try {
         const querySnapshot = await getDoc(doc(db, "users", uid));
         const data = await querySnapshot.data();
+        console.log(`Document ${uid} has been retrieved`); // Logs id if get is successful.
         return data;
     } catch (error: any) {
-        console.error("Error occurred: ", error.message); // Logs an error message if the addition fails.
-        return false; // Returns false to indicate that the document was not added due to an error.
+        console.error(`Failed to get user ${uid}.`, error.message); // Logs an error message if update is unsuccessful.
+        throw new Error(error.message, error); // Throws the error for API response.
     }
 }
 
 export async function PATCH(req: NextRequest){
 
-    const battleInfo = await req.json();
-    //const battler1 = req.nextUrl.searchParams.get('battler1');
-    //const battler2 = req.nextUrl.searchParams.get('battler2');
+    const { 
+      playerId,
+      playerBattler, 
+      oppoentId,
+      oppoentName,
+      oppoentBattler, 
+    } = await req.json();
 
     try {
-        const response = await fetch(`https://rps101.pythonanywhere.com/api/v1/match?object_one=${battleInfo.playerBattler}&object_two=${battleInfo.oppoentBattler}`) ; // Sends a GET request to the API.
+        const response = await fetch(`https://rps101.pythonanywhere.com/api/v1/match?object_one=${playerBattler}&object_two=${oppoentBattler}`); // Sends a GET request to the API.
     
         if (response.ok) {
             const json = await response.json();
             const {winner, outcome, loser} = json;
-        
             let message = "";
-            if(winner == battleInfo.playerBattler){
-                await updateToFireStore(battleInfo.playerId, winner, "win");
-                await updateToFireStore(battleInfo.oppoentId, loser, "lose");
-                message = `Your ${battleInfo.playerBattler} ${outcome} ${battleInfo.oppoentName}'s ${battleInfo.oppoentBattler}`;
-              } else if( winner == battleInfo.oppoentBattler) {
-                await updateToFireStore(battleInfo.playerId, loser, "lose");
-                await updateToFireStore(battleInfo.oppoentId, winner, "win");
-                message = `${battleInfo.oppoentName}'s ${battleInfo.oppoentBattler} ${outcome} your ${battleInfo.playerBattler}`;
+
+            // Update database and result message according to API response
+            if(winner == playerBattler){
+                await updateToFireStore(playerId, winner, "win");
+                await updateToFireStore(oppoentId, loser, "lose");
+                message = `Your ${playerBattler} ${outcome} ${oppoentName}'s ${oppoentBattler}`;
+              } else if( winner == oppoentBattler) {
+                await updateToFireStore(playerId, loser, "lose");
+                await updateToFireStore(oppoentId, winner, "win");
+                message = `${oppoentName}'s ${oppoentBattler} ${outcome} your ${playerBattler}`;
               } else {
-                await updateToFireStore(battleInfo.playerId, null, "draw");
-                await updateToFireStore(battleInfo.oppoentId, null, "draw");
-                message = `Your ${battleInfo.playerBattler} vs ${battleInfo.oppoentName}'s ${battleInfo.oppoentBattler}. It's a draw.`;
+                await updateToFireStore(playerId, null, "draw");
+                await updateToFireStore(oppoentId, null, "draw");
+                message = `Your ${playerBattler} vs ${oppoentName}'s ${oppoentBattler}. It's a draw.`;
             }
 
-            const data = await getDataFromFireStore(battleInfo.playerId);
+            // Reply updated user data and result message
+            const data = await getDataFromFireStore(playerId);
             return NextResponse.json({message: message, data: data}, {status: 200});
 
         } else {
-          console.log("Failed to fetch RSP API battle function."); // Throws an error if the response is not OK.
+          throw new Error("Failed to fetch RSP API battle function."); // Throws the error if the response is not OK.
         }
       } catch (error: any) {
-        console.error("Error occurred: ", error.message); // Logs an error message if the addition fails.
+        console.error("Error occurred: ", error.message); // Logs an error message if the Patch fails.
+        return NextResponse.json({ message: "Internal Server Error: " + error.message, data: null }, { status: 500 });
     }
-
 }

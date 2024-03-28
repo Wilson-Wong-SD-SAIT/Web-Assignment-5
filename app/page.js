@@ -19,7 +19,7 @@ export default function Page() {
     <div className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
       {user && userData ? (
         <>
-          <p className="text-2xl font-bold mb-4 text-red-800">Welcome {userData.name}!</p>
+          <p className="text-2xl font-bold mb-4 text-red-800">Welcome {userData.name}!</p>        
           <button className="mt-4 px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-700 text-white font-bold  transition duration-300 ease-in-out">
             <Link href="/draw">Draw</Link>
           </button>

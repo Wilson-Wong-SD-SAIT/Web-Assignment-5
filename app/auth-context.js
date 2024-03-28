@@ -54,33 +54,36 @@ export const AuthContextProvider = ({ children }) => {
         if (response.ok) {
           const json = await response.json(); 
           if (json.exist) {
+            // Set Existing User items to context
             setUserData(json);
             console.log("Document has been retrieved"); 
-            return true; // Returns true to indicate that the document was successfully added.
           } else {
             // Create New User
             let name = null;
-            while (!name){ name = prompt("Please enter your Username","Ash Ketchum"); }
+            while (!name){ name = prompt("Please enter your Username","Ash Ketchum"); setTimeout(()=>{}, 1000);}
               // Sends a PUT request to update user data for draw.
-              const response = await fetch(`http://localhost:3001/api/user/${uid}`, {
+              const createResponse = await fetch(`http://localhost:3001/api/user/${uid}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: name, email: email,}), 
               });
-              if (response.ok) {
-                setUserData(json);
+              if (createResponse.ok) {
+                const createJson = await createResponse.json(); 
+                setUserData(createJson);
                 console.log("Document has been created"); // Logs the ID of the new document if addition is successful.
-                return true; // Returns true to indicate that the document was successfully added.
+              } else {
+                throw new Error("Failed to call API create new user."); // Throws an error if the response is not OK.
               }
           }
+        } else {
+          throw new Error("Failed to call API fetch existing user items."); // Throws an error if the response is not OK.
         }
       } catch (error) {
         console.error("Error occurred: ", error); // Logs an error message if the addition fails.
-        return false; // Returns false to indicate that the document was not added due to an error.
       }
     }
-
   }
+
   // Effect hook to monitor the authentication state change.
   // It sets the user state based on Firebase's current user.
   // Cleans up by unsubscribing from the auth state listener when the component unmounts or user changes.
@@ -88,8 +91,7 @@ export const AuthContextProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser !== null){
-        fetchDataFromFirestore(user.uid,user.email);
-        //(async ()=> { (await fetchDataFromFirestore(currentUser.uid,currentUser.email))  })();
+        fetchDataFromFirestore(currentUser.uid,currentUser.email);
       }  
       
     });
