@@ -10,7 +10,7 @@ export default function Draw() {
   async function onClickDraw() {
     try {
       // Sends a PATCH request to update user data for draw.
-      const response = await fetch(`http://localhost:3001/api/draw/${user.uid}`, {
+      const response = await fetch(`/api/draw/${user.uid}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
       });

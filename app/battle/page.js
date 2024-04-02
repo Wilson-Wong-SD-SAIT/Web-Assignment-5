@@ -8,7 +8,7 @@ import Link from "next/link";
 async function fetchDataFromFirestore() {
   try {
     // Sends a GET request to get all user data.
-    const response = await fetch(`http://localhost:3001/api/userAll/`);
+    const response = await fetch(`/api/userAll/`);
     if (response.ok) {
       const json = await response.json(); 
       return json;
@@ -43,7 +43,7 @@ export default function Battle() {
 
     try {
       // Sends a PATCH request to update users data for battle.
-      const response = await fetch(`http://localhost:3001/api/battle?battler1=${playerBattler}&battler2=${oppoentBattler}`, {
+      const response = await fetch(`/api/battle?battler1=${playerBattler}&battler2=${oppoentBattler}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

@@ -50,7 +50,7 @@ export const AuthContextProvider = ({ children }) => {
     if (user !== null){
       try {
         // Sends a GET request to get user items.
-        const response = await fetch(`http://localhost:3001/api/user/${uid}`);
+        const response = await fetch(`/api/user/${uid}`);
         if (response.ok) {
           const json = await response.json(); 
           if (json.exist) {
@@ -62,7 +62,7 @@ export const AuthContextProvider = ({ children }) => {
             let name = null;
             while (!name){ name = prompt("Please enter your Username","Ash Ketchum"); setTimeout(()=>{}, 1000);}
               // Sends a PUT request to update user data for draw.
-              const createResponse = await fetch(`http://localhost:3001/api/user/${uid}`, {
+              const createResponse = await fetch(`/api/user/${uid}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: name, email: email,}), 
