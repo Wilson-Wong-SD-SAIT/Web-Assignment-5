@@ -118,3 +118,6 @@ export default function Battle() {
     </main>
   );
 }
+
+// disable vercel cache to prevent non-reloading usersData
+export const dynamic = 'force-dynamic';
