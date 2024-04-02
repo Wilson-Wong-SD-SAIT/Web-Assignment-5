@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useUserAuth } from "../auth-context"; // Adjust the path as needed
 import Link from "next/link";
+import { unstable_noStore as noStore } from 'next/cache';
 
 // Asynchronously fetches user data from Firestore
 async function fetchDataFromFirestore() {
@@ -67,6 +68,9 @@ export default function Battle() {
       
   }
 
+  // disable vercel cache to prevent non-reloading usersData
+  noStore();
+
   // Fetch user data from Firestore when the component mounts
   useEffect(() => {
     async function fetchData() {
@@ -119,5 +123,4 @@ export default function Battle() {
   );
 }
 
-// disable vercel cache to prevent non-reloading usersData
-export const dynamic = 'force-dynamic';
+
