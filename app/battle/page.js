@@ -43,7 +43,7 @@ export default function Battle() {
 
     try {
       // Sends a PATCH request to update users data for battle.
-      const response = await fetch(`/api/battle?battler1=${playerBattler}&battler2=${oppoentBattler}`, {
+      const response = await fetch(`/api/battle`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
