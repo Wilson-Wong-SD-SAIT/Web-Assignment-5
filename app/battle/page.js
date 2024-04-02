@@ -74,8 +74,8 @@ export default function Battle() {
   // Fetch user data from Firestore when the component mounts
   useEffect(() => {
     async function fetchData() {
-      const data = await fetchDataFromFirestore(); // Get user data from Firestore
-      setUsersData(data); // Update state with the fetched user data
+      // const data = await fetchDataFromFirestore();  Get user data from Firestore
+      setUsersData(await fetchDataFromFirestore()); // Update state with the fetched user data
     }
     fetchData();
   }, [userData]); // Re-render component if user data changed after battle
