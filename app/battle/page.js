@@ -9,7 +9,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 async function fetchDataFromFirestore() {
   try {
     // Sends a GET request to get all user data.
-    const response = await fetch(`/api/userAll/`);
+    const response = await fetch(`/api/userAll/`, { cache: 'no-store' });
     if (response.ok) {
       const json = await response.json(); 
       return json;
@@ -23,9 +23,18 @@ async function fetchDataFromFirestore() {
 }
 
 export default function Battle() {
+  // disable vercel cache to prevent non-reloading usersData
+  noStore();
+
   // State variables for the component
   const [usersData, setUsersData] = useState([]); // Holds array of user data fetched from Firestore
   const { user, userData, onSetUserData } = useUserAuth(); // Assume no need for firebaseSignOut directly here unless a logout feature on this page is desired
+
+
+  async function fetchData() {
+    const data = await fetchDataFromFirestore(); // Get user data from Firestore
+    setUsersData(data); // Update state with the fetched user data
+  }
 
   async function onClickBattle(e) {
     // prevent user to battle without battler
@@ -33,6 +42,12 @@ export default function Battle() {
       alert("You don't have any battler. Draw first.")
       return;
     }
+    // prevent Opponent to battle without battler
+    if (usersData[e.target.value].items.length == 0) {
+      alert("Opponent don't have any battler. Let it go.")
+      return;
+    } 
+
     let playerId = user.uid;
     // pick randomr battler from User
     let playerBattler = userData.items[Math.floor((Math.random() * userData.items.length))];
@@ -59,6 +74,7 @@ export default function Battle() {
         const json = await response.json(); 
         alert(json.message); 
         onSetUserData(json.data);
+        setUsersData(await fetchDataFromFirestore());   
       } else {
         throw new Error("Failed to call API battle."); // Throws an error if the response is not OK.
       }
@@ -68,17 +84,12 @@ export default function Battle() {
       
   }
 
-  // disable vercel cache to prevent non-reloading usersData
-  noStore();
+
 
   // Fetch user data from Firestore when the component mounts
   useEffect(() => {
-    async function fetchData() {
-      // const data = await fetchDataFromFirestore();  Get user data from Firestore
-      setUsersData(await fetchDataFromFirestore()); // Update state with the fetched user data
-    }
     fetchData();
-  }, [userData]); // Re-render component if user data changed after battle
+  },[userData]); // Re-render component if user data changed after battle 
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
