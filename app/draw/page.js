@@ -16,7 +16,7 @@ export default function Draw() {
       });
       if (response.ok) {
         const json = await response.json(); 
-        alert("You just draw: " + json.item); 
+        alert("You just drew: " + json.item); 
         onSetUserData(json.data);
       } else {
         throw new Error("Failed to call API draw."); // Throws an error if the response is not OK.
@@ -27,21 +27,21 @@ export default function Draw() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
-      <h1 className="text-2xl font-bold mb-4 text-red-800">
-        Beware you could not own duplicate item
+    <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-[#004763]">
+      <h1 className="text-2xl font-bold mb-4 text-white">
+        Beware you can not own duplicate items
       </h1>
       {user ? (
         <>
-          <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+          <button className="px-6 py-3 rounded-full mt-4 bg-teal-800 hover:bg-teal-900 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
           onClick={onClickDraw}>
-            Try my luck
+            Draw!
           </button>
         </>
       ) : (
-        <p>Please log in to play RSP game.</p>
+        <p>Please log in to play RPS game.</p>
       )}
-        <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+        <button className="px-6 py-3 rounded-full mt-4 bg-red-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
             <Link href="/">Home</Link>
         </button>
 

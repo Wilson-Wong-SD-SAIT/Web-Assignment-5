@@ -10,10 +10,10 @@ export default function Rsp() {
     <div className="container mx-auto bg-gray-800 text-white py-4">
         {userData && 
           (<div className="flex flex-col">
-            <p><strong>Name:</strong> {userData.name}</p>
-            <p><strong>Win:</strong> {userData.win}</p>
-            <p><strong>Draw:</strong> {userData.draw}</p>
-            <p><strong>Lose:</strong> {userData.lose}</p>
+            <p className="px-4"><strong>Name:</strong> {userData.name}</p>
+            <p className="px-4"><strong>Win:</strong> {userData.win}</p>
+            <p className="px-4"><strong>Draw:</strong> {userData.draw}</p>
+            <p className="px-4"><strong>Lose:</strong> {userData.lose}</p>
             <ul className="flex justify-center space-x-4">
               {userData.items.map((rspItem, index) => (
                 <li className="hover:text-gray-300" key={index}>{rspItem}</li>

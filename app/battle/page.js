@@ -92,17 +92,17 @@ export default function Battle() {
   },[userData]); // Re-render component if user data changed after battle 
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-blue-100">
-      <p className="text-2xl font-bold mb-4 text-red-400">Let knock out oppoent's Rock-Scissors-Paper!</p>
+    <main className="flex min-h-screen flex-col items-center justify-center p-10 bg-[#4f0606]">
+      <p className="text-2xl font-bold mb-4 text-white">Lets knock out your opponents with Rock-Paper-Scissors!</p>
       {user ? (
         <div className="w-full lg:w-1/2 px-4">
-          <div className="bg-white rounded shadow p-6">
+          <div className="bg-[#2f0000] rounded shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Users List</h2>
             {/* Opponent grid */}
             <div className="space-y-4 text-black">
               {usersData.map((uData, userInd) => 
                 uData.id != user.uid &&
-                (<div key={uData.id} className="p-4 bg-gray-100 rounded-lg">
+                (<div key={uData.id} className="p-4 bg-stone-300 rounded-lg">
                     <p><strong>Name:</strong> {uData.name}</p>
                     <p><strong>Win:</strong> {uData.win}</p>
                     <p><strong>Draw:</strong> {uData.draw}</p>
@@ -112,7 +112,7 @@ export default function Battle() {
                         <li className="hover:text-gray-300 " key={rspInd}>{rspItem}</li>
                       ))}
                     </ul>
-                    <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                    <button className="px-6 py-3 rounded-full mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
                     onClick={onClickBattle} value={userInd}>
                     Battle!
                     </button>
@@ -127,7 +127,7 @@ export default function Battle() {
         <p>Please log in to play RSP game.</p>
       )}
 
-        <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+        <button className="px-6 py-3 rounded-full mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
             <Link href="/">Home</Link>
         </button>
     </main>
