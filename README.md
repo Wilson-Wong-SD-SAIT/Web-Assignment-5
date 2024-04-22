@@ -1,6 +1,6 @@
 ## Project overview
 
-This is a web game. Users obtain various “Rock-Paper-Scissors” objects randomly from [API][(https://rps101.pythonanywhere.com/api)] and could use those to battle with another users. 
+This is a web game. Users obtain various “Rock-Paper-Scissors” objects randomly from [API](https://rps101.pythonanywhere.com/api) and could use those to battle with another users. 
 
 ## Installation instructions
 
