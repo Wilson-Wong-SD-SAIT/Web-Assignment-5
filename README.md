@@ -1,6 +1,6 @@
 ## Project overview
 
-This is a web game. Users obtain various “Rock-Paper-Scissors” objects randomly from [API]([https://nextjs.org/)](https://rps101.pythonanywhere.com/api) and could use those to battle with another users. 
+This is a web game. Users obtain various “Rock-Paper-Scissors” objects randomly from [API][(https://rps101.pythonanywhere.com/api)] and could use those to battle with another users. 
 
 ## Installation instructions
 
@@ -26,8 +26,6 @@ To set up your own firebase configuration (optional):
 
 ## Usage guide
 
-1.  user login through Github account 
-2.  user get 5 random online Rock-Paper-Scissors “object” daily
-3.  user could choose another user from the board, then 1 "object " is drawn to battle.  Result is unpredictable since both the "objects " from user and another user are randomized.
-4.  the user name and battle result would be displayed on the board for public view.
-
+1.  Login through Github account 
+2.  In **Draw** section, get random online Rock-Paper-Scissors “object” 
+3.  In **Battle** section, choose another user from the board to battle with randomly drawn own object. Loser's object would be knocked out.
